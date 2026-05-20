@@ -1,0 +1,541 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .quiz-wrap {
+    padding: 1.5rem 1rem;
+    max-width: 620px;
+    margin: 0 auto;
+    font-family: 'Times New Roman', Times, serif;
+  }
+
+  .quiz-header { text-align: center; margin-bottom: 1.5rem; }
+
+  .quiz-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a2e5a;
+    margin-bottom: 6px;
+  }
+
+  .quiz-header p {
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+  }
+
+  .topic-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    font-family: Arial, sans-serif;
+  }
+
+  .badge-laser     { background: #c2daff; color: #0d3a7a; }
+  .badge-instrumen { background: #d5f5e3; color: #1a5c2e; }
+
+  .progress-bar-bg {
+    background: #e0e8f5;
+    border-radius: 20px;
+    height: 8px;
+    margin: 12px 0 6px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: #1a3d6e;
+    border-radius: 20px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    font-size: 12px;
+    color: #888;
+    text-align: right;
+    font-family: Arial, sans-serif;
+    margin-bottom: 1.2rem;
+  }
+
+  .question-card {
+    background: #eef4fb;
+    border: 2px solid #a8c4e8;
+    border-radius: 16px;
+    padding: 1.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .question-card.instrumen {
+    background: #f0faf4;
+    border-color: #7dcb9a;
+  }
+
+  .question-emoji {
+    font-size: 32px;
+    display: block;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .question-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a2e5a;
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+
+  .question-card.instrumen .question-text { color: #1a4a2e; }
+
+  .question-hint {
+    font-size: 13px;
+    color: #557;
+    text-align: center;
+    font-style: italic;
+  }
+
+  .def-box {
+    background: white;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+    margin-top: 10px;
+    border: 1px dashed #aac;
+    font-style: italic;
+  }
+
+  .question-card.instrumen .def-box {
+    border-color: #7dcb9a;
+    color: #1a4a2e;
+  }
+
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .opt-btn {
+    background: white;
+    border: 1.5px solid #a8c4e8;
+    border-radius: 12px;
+    padding: 12px 10px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    color: #1a2e5a;
+    cursor: pointer;
+    transition: all 0.18s;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .opt-btn.instrumen-opt { border-color: #7dcb9a; color: #1a4a2e; }
+
+  .opt-btn:hover:not(:disabled) {
+    background: #d6e8ff;
+    border-color: #1a3d6e;
+    transform: scale(1.02);
+  }
+
+  .opt-btn.instrumen-opt:hover:not(:disabled) {
+    background: #c8f0d8;
+    border-color: #2a8a50;
+  }
+
+  .opt-btn.correct {
+    background: #d4f5e2;
+    border-color: #2a8a50;
+    color: #1a5c35;
+    font-weight: 700;
+  }
+
+  .opt-btn.wrong {
+    background: #fde2e2;
+    border-color: #c0392b;
+    color: #7a1010;
+  }
+
+  .opt-btn:disabled { cursor: default; }
+
+  .feedback {
+    text-align: center;
+    font-size: 14px;
+    min-height: 22px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    transition: opacity 0.3s;
+  }
+
+  .feedback.ok { color: #2a8a50; }
+  .feedback.ko { color: #c0392b; }
+
+  .next-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: #1a3d6e;
+    color: #eef4fb;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .next-btn:hover { background: #0d2a52; }
+  .next-btn:disabled { background: #aaa; cursor: default; }
+
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .result-screen h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .result-screen p {
+    font-size: 15px;
+    color: #444;
+    font-style: italic;
+    margin-bottom: 1.2rem;
+  }
+
+  .score-badge {
+    display: inline-block;
+    font-size: 40px;
+    font-weight: 700;
+    background: #eef4fb;
+    border: 3px solid #a8c4e8;
+    border-radius: 50%;
+    width: 90px;
+    height: 90px;
+    line-height: 90px;
+    color: #1a2e5a;
+    margin-bottom: 1rem;
+  }
+
+  .dancer {
+    font-size: 60px;
+    display: block;
+    animation: bounce 0.5s infinite alternate;
+    margin-bottom: 6px;
+  }
+
+  @keyframes bounce {
+    from { transform: translateY(0) rotate(-5deg); }
+    to   { transform: translateY(-12px) rotate(5deg); }
+  }
+
+  .confetti-row {
+    font-size: 22px;
+    letter-spacing: 6px;
+    margin-bottom: 10px;
+    animation: shimmer 1s infinite alternate;
+  }
+
+  @keyframes shimmer {
+    from { opacity: 0.7; }
+    to   { opacity: 1; }
+  }
+
+  .retry-btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 10px 28px;
+    background: #8b1a4a;
+    color: #fff0f5;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .retry-btn:hover { background: #6a1238; }
+
+  .section-divider {
+    text-align: center;
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 6px;
+  }
+</style>
+
+<div class="quiz-wrap">
+  <div class="quiz-header">
+    <h1>🦷 ¿Cuánto has aprendido?</h1>
+    <p>Test sobre láser en periodoncia e instrumental quirúrgico</p>
+  </div>
+
+  <div id="quiz-body">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="prog-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-label" id="prog-label">Pregunta 1 de 10</div>
+
+    <div class="section-divider" id="section-label"></div>
+
+    <div class="question-card" id="question-card">
+      <span class="question-emoji" id="q-emoji"></span>
+      <div class="question-text" id="q-text"></div>
+      <div class="question-hint" id="q-hint"></div>
+      <div class="def-box" id="def-box" style="display:none"></div>
+    </div>
+
+    <div class="options" id="options-grid"></div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <button class="next-btn" id="next-btn" disabled onclick="nextQuestion()">Siguiente →</button>
+  </div>
+
+  <div class="result-screen" id="result-screen">
+    <div id="result-top"></div>
+    <div class="score-badge" id="score-badge"></div>
+    <h2 id="result-title"></h2>
+    <p id="result-msg"></p>
+    <button class="retry-btn" onclick="restartQuiz()">🔄 Volver a intentarlo</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    topic: "laser",
+    emoji: "💡",
+    text: "¿En qué año se introdujo el láser en Odontología?",
+    hint: "Fue hace más de 30 años...",
+    def: null,
+    options: ["1975", "1990", "2000", "1985"],
+    correct: 1
+  },
+  {
+    topic: "laser",
+    emoji: "🔬",
+    text: "¿Qué tipo de láser se usa para tejidos DUROS?",
+    hint: "Su nombre viene de un elemento de la tabla periódica",
+    def: null,
+    options: ["Láser CO₂", "Láser Nd-YAG", "Láser ER-YAG (Erbio)", "Láser de argón"],
+    correct: 2
+  },
+  {
+    topic: "laser",
+    emoji: "💥",
+    text: "El mecanismo del láser ER-YAG se basa en...",
+    hint: "Piensa en agua, presión y explosiones muy pequeñas",
+    def: null,
+    options: ["Vibración ultrasónica", "Ablación termodinámica con microexplosiones", "Corte mecánico directo", "Efecto fotoquímico"],
+    correct: 1
+  },
+  {
+    topic: "laser",
+    emoji: "✂️",
+    text: "¿Cuál es el gran superpoder del láser de tejidos blandos (CO₂ / Nd-YAG)?",
+    hint: "Hace dos cosas a la vez mientras opera...",
+    def: null,
+    options: ["Regenera el hueso", "Elimina cálculo subgingival", "Corta y coagula simultáneamente", "No genera calor"],
+    correct: 2
+  },
+  {
+    topic: "laser",
+    emoji: "🦠",
+    text: "¿Qué capacidad especial tiene el láser ER-YAG frente a bacterias?",
+    hint: "No solo limpia, también...",
+    def: null,
+    options: ["Es anestésico local", "Es bactericida frente a periodontopatógenos", "Produce fluorosis", "Aumenta la sensibilidad"],
+    correct: 1
+  },
+  {
+    topic: "laser",
+    emoji: "🏥",
+    text: "¿En cuál de estos procedimientos se usa el láser de tejidos blandos?",
+    hint: "Es una cirugía para remodelar la encía",
+    def: null,
+    options: ["Ortodoncia con brackets", "Implantes oseointegrados", "Gingivectomía", "Endodoncia quirúrgica ósea"],
+    correct: 2
+  },
+  {
+    topic: "instrumental",
+    emoji: "🔧",
+    text: "¿Qué instrumento es este?",
+    hint: "Lee bien la definición...",
+    def: "Instrumento de despegamiento mucoperióstico para separar el colgajo de su lecho. Presenta una punta roma y una aguda.",
+    options: ["Sindesmotomo", "Periostotomo", "Cureta Gracey", "Pinza Gubia"],
+    correct: 1
+  },
+  {
+    topic: "instrumental",
+    emoji: "🔪",
+    text: "¿Qué instrumento es este?",
+    hint: "Fíjate en qué tipo de incisiones se usa...",
+    def: "Para incisión y escisión. Hoja Nº12 para sectores posteriores, Nº15 para incisiones generales y Nº11 para colgajos a espesor parcial.",
+    options: ["Hoces", "Sindesmotomo", "Hojas de bisturí", "Tijeras quirúrgicas"],
+    correct: 2
+  },
+  {
+    topic: "instrumental",
+    emoji: "🦷",
+    text: "¿Qué instrumento es este?",
+    hint: "Tienen nombres numerados según la zona de la boca...",
+    def: "Para raspado y alisado radicular y eliminación de cálculo subgingival. Los números 11/12 son para mesial y 13/14 para distal.",
+    options: ["Azadas o Azadones", "Curetas Gracey", "Hoces", "Fresas Perio Set"],
+    correct: 1
+  },
+  {
+    topic: "instrumental",
+    emoji: "🧵",
+    text: "¿Qué instrumento es este?",
+    hint: "Se usa al final de la cirugía para cerrar...",
+    def: "Para el cierre de colgajos tras la intervención. Pueden ser absorbibles o no absorbibles. Las más usadas son la seda trenzada y el nylon monofilamento.",
+    options: ["Portaagujas", "Pinza Mosquito", "Sutura", "Pinzas de Disección"],
+    correct: 2
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+const TOTAL = questions.length;
+
+function loadQuestion() {
+  const q = questions[current];
+  answered = false;
+
+  const pct = (current / TOTAL) * 100;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `Pregunta ${current + 1} de ${TOTAL}`;
+
+  const card = document.getElementById('question-card');
+  const sectionLabel = document.getElementById('section-label');
+
+  if (q.topic === 'laser') {
+    card.className = 'question-card';
+    sectionLabel.textContent = '● Bloque 1 · El Láser en Periodoncia';
+    sectionLabel.style.color = '#1a3d6e';
+  } else {
+    card.className = 'question-card instrumen';
+    sectionLabel.textContent = '● Bloque 2 · Instrumental Quirúrgico';
+    sectionLabel.style.color = '#1a5c2e';
+  }
+
+  document.getElementById('q-emoji').textContent = q.emoji;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('q-hint').textContent = q.hint;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('next-btn').disabled = true;
+  document.getElementById('next-btn').textContent = current === TOTAL - 1 ? 'Ver resultado 🏁' : 'Siguiente →';
+
+  const defBox = document.getElementById('def-box');
+  if (q.def) {
+    defBox.style.display = 'block';
+    defBox.textContent = q.def;
+    if (q.topic === 'instrumental') defBox.className = 'def-box instrumen';
+    else defBox.className = 'def-box';
+  } else {
+    defBox.style.display = 'none';
+  }
+
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+
+  const shuffled = q.options.map((v, i) => ({ v, i, r: Math.random() })).sort((a, b) => a.r - b.r);
+
+  shuffled.forEach(({ v, i }) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn' + (q.topic === 'instrumental' ? ' instrumen-opt' : '');
+    btn.textContent = v;
+    btn.onclick = () => selectAnswer(i, btn, shuffled);
+    grid.appendChild(btn);
+  });
+}
+
+function selectAnswer(originalIdx, clickedBtn, shuffled) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[current];
+  const allBtns = document.querySelectorAll('.opt-btn');
+  const fb = document.getElementById('feedback');
+
+  allBtns.forEach(b => b.disabled = true);
+
+  if (originalIdx === q.correct) {
+    clickedBtn.classList.add('correct');
+    fb.textContent = '¡Correcto! Muy bien';
+    fb.className = 'feedback ok';
+    score++;
+  } else {
+    clickedBtn.classList.add('wrong');
+    allBtns.forEach((b, idx) => {
+      if (shuffled[idx] && shuffled[idx].i === q.correct) b.classList.add('correct');
+    });
+    fb.textContent = 'No era esa... ¡La correcta está en verde!';
+    fb.className = 'feedback ko';
+  }
+
+  document.getElementById('next-btn').disabled = false;
+}
+
+function nextQuestion() {
+  current++;
+  if (current < TOTAL) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById('quiz-body').style.display = 'none';
+  const rs = document.getElementById('result-screen');
+  rs.style.display = 'block';
+
+  document.getElementById('score-badge').textContent = score + '/' + TOTAL;
+
+  if (score === TOTAL) {
+    document.getElementById('result-top').innerHTML =
+      '<span class="dancer">🕺</span><div class="confetti-row">🎊🎉✨🎊🎉✨</div>';
+    document.getElementById('result-title').textContent = '¡¡Eres todo un experto/a!! 🏆';
+    document.getElementById('result-title').style.color = '#1a5c35';
+    document.getElementById('result-msg').textContent =
+      '¡Perfecto! Láser, instrumental... ¡no hay nada que se te resista! 🦷🔬';
+  } else {
+    document.getElementById('result-top').innerHTML = '<div style="font-size:54px;margin-bottom:8px">😅</div>';
+    document.getElementById('result-title').textContent = '¡Ya casi lo tienes!';
+    document.getElementById('result-title').style.color = '#8b1a4a';
+    document.getElementById('result-msg').textContent =
+      'Has fallado alguna... ¡vuelve a intentarlo y llega al 10/10! 💪';
+  }
+}
+
+function restartQuiz() {
+  current = 0;
+  score = 0;
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('quiz-body').style.display = 'block';
+  loadQuestion();
+}
+
+loadQuestion();
+</script>
